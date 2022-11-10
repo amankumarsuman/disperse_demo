@@ -12,18 +12,16 @@ function CombineBalance({ combineBalanceArr }) {
           margin: "auto",
           padding: "20px",
           backgroundColor: "#e8dcdc",
-          //   marginTop: "20px",
         }}
       >
         <div>
           {combineBalanceArr?.map((el, index) => (
-            <div style={{ display: "flex" }}>
+            <div key={index} style={{ display: "flex" }}>
               <p>{index + 1} </p>
               <Divider
                 orientation="vertical"
                 flexItem
                 sx={{
-                  //   border: "0.2px solid grey",
                   marginLeft: "10px",
                   marginRight: "10px",
                 }}

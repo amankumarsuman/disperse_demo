@@ -4,15 +4,22 @@ import { useState } from "react";
 import CombineBalance from "./CombineBalance";
 import CustomizedSnackbars from "./SnackBar";
 
-export default function Disperse() {
+export default function TestingComponent() {
   const [input, setInput] = useState("");
   const [data, setData] = useState([]);
+  const [address, setAddress] = useState([]);
+  const [message, setMessage] = useState([]);
   const [open, setOpen] = useState(false);
+  const [addressObject, setAddressObject] = useState({});
   const [isCombineBalance, setIsCombineBalance] = useState(false);
   const [iskeepFirstAddress, setIskeepFirstAddress] = useState(false);
-  const [message, setMessage] = useState([]);
   const [keepFirstAddress, setKeepFirstAddress] = useState([]);
   const [combineBalanceArr, setCombineBalance] = useState([]);
+
+  //function to cupdate input state
+  const handleChange = (e) => {
+    setInput(e.target.value);
+  };
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -21,92 +28,118 @@ export default function Disperse() {
 
     setOpen(false);
   };
-
-  const handleChange = (e) => {
-    setInput(e.target.value);
-  };
+  // function to store input data
   const arrangeData = () => {
     setData([input]);
   };
-  useEffect(() => {
-    let msg = "";
-    for (var i = 0; i < newArr?.length; i = i + 2) {
-      if (newArr[i][0] === newArr[i + 1][0]) {
-        msg = `${msg}Address ${newArr[i][0]} encountered duplicate in line ${
-          i + 1
-        },${i + 2}:`;
 
-        setMessage([msg]);
-      }
-
-      if (isNaN(+newArr[i][1])) {
-        msg = `${msg}Line ${i + 1} wrong amount :`;
-        setMessage([msg]);
-      }
-      if (isNaN(+newArr[i + 1][1])) {
-        msg = `${msg}Line  ${i + 2} wrong amount :`;
-        setMessage([msg]);
-      }
-    }
-  }, [data]);
-  // /[\s,]+/;
   var myData = data.map((el) => el.split("\n"));
   var newArr = myData[0]?.map((el) => el.split(" "));
 
+  //useEffect hook to render the logic once when data state change
+  useEffect(() => {
+    let msg = "";
+
+    for (var k = 0; k < address.length; k++) {
+      for (var j = 0; j < newArr.length; j++) {
+        if (address[k] === newArr[j][0]) {
+          msg = `${msg}Address ${newArr[j][0]} encountered duplicate in line ${
+            j + 1
+          }:`;
+
+          setMessage([msg]);
+        }
+        if (isNaN(+newArr[j][1])) {
+          msg = `${msg}Line ${j + 1} wrong amount :`;
+          setMessage([msg]);
+        }
+      }
+    }
+
+    var obj = {};
+    for (var i = 0; i < newArr?.length; i++) {
+      obj[newArr[i][0]] = obj[newArr[i][0]] ? obj[newArr[i][0]] + 1 : 1;
+    }
+    setAddressObject(obj);
+
+    arrangeData();
+    addresssCheck();
+  }, [data]);
+
+  //function to store duplicate address data
+  function addresssCheck() {
+    var datas = [];
+
+    for (let key in addressObject) {
+      if (addressObject[key] > 1) {
+        datas.push(key);
+      }
+    }
+    setAddress(datas);
+  }
+
+  //function to handle submit event
   const handleSubmit = (e) => {
     e.preventDefault();
     arrangeData();
-
+    addresssCheck();
     setOpen(true);
     setIsCombineBalance(false);
     setIskeepFirstAddress(false);
   };
 
+  //function to keepFirstAddress
   const keepFirstOne = () => {
     setIsCombineBalance(false);
     setIskeepFirstAddress(true);
     var keepFirstAddressArray = [];
-    for (var i = 0; i < newArr?.length; i = i + 2) {
-      let addressObject = {
-        address: "",
-        amount: 0,
-      };
-      if (newArr[i][0] === newArr[i + 1][0]) {
-        addressObject.address = newArr[i][0];
-        addressObject.amount = newArr[i][1];
+    var keepFirstAddressObj = {};
+    for (var j = 0; j < newArr?.length; j++) {
+      if (keepFirstAddressObj[newArr[j][0]] === undefined) {
+        keepFirstAddressObj[newArr[j][0]] = newArr[j][1];
       }
-      keepFirstAddressArray.push(addressObject);
-
-      setKeepFirstAddress(keepFirstAddressArray);
     }
+
+    for (let key in keepFirstAddressObj) {
+      console.log(key, keepFirstAddressObj[key]);
+      keepFirstAddressArray.push({
+        address: key,
+        amount: keepFirstAddressObj[key],
+      });
+    }
+    setKeepFirstAddress(keepFirstAddressArray);
   };
 
+  //function to combineBalance
   const combineBalance = () => {
     setIsCombineBalance(true);
     setIskeepFirstAddress(false);
     var combineBalanceArray = [];
-    for (var i = 0; i < newArr?.length; i = i + 2) {
-      let combineBalanceObject = {
-        address: "",
-        amount: 0,
-      };
-      if (newArr[i][0] === newArr[i + 1][0]) {
-        combineBalanceObject.address = newArr[i][0];
-        combineBalanceObject.amount = +newArr[i][1] + Number(newArr[i + 1][1]);
+    var combineBalanceObj = {};
+    for (var j = 0; j < newArr?.length; j++) {
+      if (combineBalanceObj[newArr[j][0]] === undefined) {
+        combineBalanceObj[newArr[j][0]] = +newArr[j][1];
+      } else {
+        combineBalanceObj[newArr[j][0]] =
+          combineBalanceObj[newArr[j][0]] + +newArr[j][1];
       }
-
-      combineBalanceArray.push(combineBalanceObject);
-
-      setCombineBalance(combineBalanceArray);
     }
-  };
 
+    for (let key in combineBalanceObj) {
+      console.log(key, combineBalanceObj[key]);
+      combineBalanceArray.push({
+        address: key,
+        amount: combineBalanceObj[key],
+      });
+    }
+    setCombineBalance(combineBalanceArray);
+  };
   return (
     <Paper
       elevation={6}
       sx={{ marginTop: "50px", padding: "50px", width: "60%", margin: "auto" }}
     >
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={(e) => handleSubmit(e)}>
         <TextareaAutosize
           aria-label="minimum height"
           minRows={4}
@@ -133,7 +166,6 @@ export default function Disperse() {
           </Grid>
         </Grid>
       </form>
-
       {open ? (
         <CustomizedSnackbars
           open={open}
