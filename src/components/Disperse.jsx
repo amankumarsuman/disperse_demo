@@ -101,7 +101,6 @@ export default function TestingComponent() {
     }
 
     for (let key in keepFirstAddressObj) {
-      console.log(key, keepFirstAddressObj[key]);
       keepFirstAddressArray.push({
         address: key,
         amount: keepFirstAddressObj[key],
@@ -126,7 +125,6 @@ export default function TestingComponent() {
     }
 
     for (let key in combineBalanceObj) {
-      console.log(key, combineBalanceObj[key]);
       combineBalanceArray.push({
         address: key,
         amount: combineBalanceObj[key],
